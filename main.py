@@ -22,8 +22,10 @@ class Game(Ursina):
         self.cubes_side_positons = {'LEFT': self.LEFT, 'BOTTOM': self.BOTTOM, 'RIGHT': self.RIGHT, 'FACE': self.FACE,
                                     'BACK': self.BACK, 'TOP': self.TOP}
         self.animation_time = 0.5
+        self.action_trigger = True
 
     def toggle_animation_trigger(self):
+        '''prohibiting side rotation during rotation animation'''
         self.action_trigger = not self.action_trigger
 
     def rotate_side(self, side_name):
@@ -35,7 +37,7 @@ class Game(Ursina):
             if cube.position in cube_positions:
                 cube.parent = self.PARENT
                 eval(f'self.PARENT.animate_rotation_{rotation_axis}(90, duration=self.animation_time)')
-        invoke(self.toggle_animation_trigger, delay=self.animation_time | 0.11)
+        invoke(self.toggle_animation_trigger, delay=self.animation_time + 0.11)
 
     def reparent_to_scene(self):
         for cube in self.CUBES:
@@ -56,8 +58,9 @@ class Game(Ursina):
 
     def input(self, key):
         keys = dict(zip('asdzxc', 'LEFT BOTTOM RIGHT TOP FACE BACK'.split()))
-        if (key in keys) and self.action_trigger:
-            self.rotate_side(keys[key])
+        if key in keys:
+            if self.action_trigger:
+                self.rotate_side(keys[key])
         super().input(key)
 
 
