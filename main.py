@@ -11,13 +11,18 @@ class Game(Ursina):
         Entity(model='sphere', scale=100, texture='textures/1', double_sided=True)
         EditorCamera()
         camera.world_position = (0, 0, -15)
-        self.model, self.texture = 'textures/cube', 'textures/rubik_texture'
+        self.model, self.texture = 'textures/custom_cube', 'textures/rubik_texture'
         self.load_game()
 
     def load_game(self):
-        Entity(model=self.model, texture=self.texture)
+        self.parent = Entity(madel='textures/custom_cube', texture='textures/parent')
+        self.cube = Entity(parent=self.parent, model=self.model, texture=self.texture, position=(-1, 1, 1))
+        self.rot = 0
 
     def input(self, key):
+        if key == 'mouse1':
+            self.rot += 90
+            self.parent.animate_rotation_x(self.rot, duration=0.5)
         super().input(key)
 
 

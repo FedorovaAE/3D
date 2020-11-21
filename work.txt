@@ -65,3 +65,20 @@ if __name__ == '__main__':
         Entity(model=self.model, texture=self.texture)
 
 Часть 3.
+1)В центр нам необходимо поместить кубик-родитель как основу.
+на нем основан весь механизм.
+2)Кубику который мы написали во второй части напишем,
+что он будет потомком родительского кубика.
+И кладем его слева от родителя.
+Сделаем вращение родителя на 90 градусов вокруг оси х,
+по нажатию левой клавиши мыши
+    def load_game(self):
+        self.parent = Entity(madel='textures/custom_cube', texture='textures/parent')
+        self.cube = Entity(parent=self.parent, model=self.model, texture=self.texture, position=(-1, 1, 1))
+        self.rot = 0
+
+    def input(self, key):
+        if key == 'mouse1':
+            self.rot += 90
+            self.parent.animate_rotation_x(self.rot, duration=0.5)
+        super().input(key)
