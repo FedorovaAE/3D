@@ -11,10 +11,11 @@ class Game(Ursina):
         Entity(model='sphere', scale=100, texture='textures/1', double_sided=True)
         EditorCamera()
         camera.world_position = (0, 0, -15)
+        self.model, self.texture = 'textures/cube', 'textures/rubik_texture'
         self.load_game()
 
     def load_game(self):
-        pass
+        Entity(model=self.model, texture=self.texture)
 
     def input(self, key):
         super().input(key)

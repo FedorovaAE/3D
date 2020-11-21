@@ -1,5 +1,12 @@
 Этапы работы (просто чтобы не забыть)
-Гугл диск с видео: https://drive.google.com/drive/folders/1gYzkVPA0PewewsVL5HgFvhdbgHuAz2Dd?usp=sharing
+Гугл диск с фото и видео : https://drive.google.com/drive/folders/1gYzkVPA0PewewsVL5HgFvhdbgHuAz2Dd?usp=sharing
+
+что надо знать (ссылки):
+http://www.ts-parfum.ru/video/aCpBzdciU0o
+https://www.ursinaengine.org/entity_basics.html
+https://www.ursinaengine.org/cheat_sheet.html#Entity
+
+из Blender мы возьмем данные объекта
 
 Часть 1.
 1) Устанавливаем ursina
@@ -39,4 +46,22 @@ if __name__ == '__main__':
     game = Game()
     game.run()
 
-видео на гугл диске
+*видео1 на гугл диске*
+
+Часть 2.
+1)Создаем модель кубика в blender
+(стороны равны 1, центр в начале локальной системы координат фото1)
+(и раскрашиваем текстуру кубика)
+делаем отдельные атрибуты пиьи для куба и его текстуры
+и создадим один экземпляр объекта используя текстуры
+(это структурная единица)
+*фото2*
+
+    в класса игры
+    self.model, self.texture = 'textures/cube', 'textures/rubik_texture'
+
+    и в функции
+    def load_game(self):
+        Entity(model=self.model, texture=self.texture)
+
+Часть 3.
