@@ -73,7 +73,7 @@ if __name__ == '__main__':
 Сделаем вращение родителя на 90 градусов вокруг оси х,
 по нажатию левой клавиши мыши
     def load_game(self):
-        self.parent = Entity(madel='textures/custom_cube', texture='textures/parent')
+        self.parent = Entity(madel='textures/custom_cube')
         self.cube = Entity(parent=self.parent, model=self.model, texture=self.texture, position=(-1, 1, 1))
         self.rot = 0
 
@@ -82,3 +82,20 @@ if __name__ == '__main__':
             self.rot += 90
             self.parent.animate_rotation_x(self.rot, duration=0.5)
         super().input(key)
+
+*видео2 родитель без текстуры*
+
+Часть 4.
+Представим кубик рубик, который вращается.
+Есть 3 грани.
+Если вращается какая-то грань, то две другие должны
+оставться неподнижны.
+Это можно сделать за счет
+соотнесения координат кубика относительно мировой сцены.
+то есть просисходит смена родителя( то куб, то мировая сцена)
+итак продолжаем
+1)(создаем левую и нижнюю стороны кубика)
+создаем метод для определения выбранных сторон
+
+
+
