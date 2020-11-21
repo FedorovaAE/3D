@@ -1,0 +1,42 @@
+Этапы работы (просто чтобы не забыть)
+Гугл диск с видео: https://drive.google.com/drive/folders/1gYzkVPA0PewewsVL5HgFvhdbgHuAz2Dd?usp=sharing
+
+Часть 1.
+1) Устанавливаем ursina
+2) Пишем класс основного приложения
+3) 2 метода: для загрузки игры и обработки нажатия клавиш
+4) создаем экземпляр приложения который будем запускать через run
+5) Создаем объекты окружения (Entity).
+Сделаем плоскость на  единиц ниже начала координат,
+сверху накладываем такстуру которая идет к комплекте движка.
+В начало координат помещаем сферу большого размера,
+на нее накладываем текстуру, т е мы внутри сферы и видим купол.
+Затем подключаем камеру.
+
+from ursina import *
+from ursina import camera
+
+
+class Game(Ursina):
+    def __init__(self):
+        super().__init__()
+        window.full_screen = True
+        Entity(model='quad', scale=60, texture='white_cube', texture_scale=(60, 60), rotation_x=90, y=-5,
+               color=color.light_gray)
+        Entity(model='sphere', scale=100, texture='textures/1', double_sided=True)
+        EditorCamera()
+        camera.world_position = (0, 0, -15)
+        self.load_game()
+
+    def load_game(self):
+        pass
+
+    def input(self, key):
+        super().input(key)
+
+
+if __name__ == '__main__':
+    game = Game()
+    game.run()
+
+видео на гугл диске

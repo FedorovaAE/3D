@@ -1,16 +1,25 @@
-# This is a sample Python script.
-
-# Press ⌃R to execute it or replace it with your code.
-# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
+from ursina import *
+from ursina import camera
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
+class Game(Ursina):
+    def __init__(self):
+        super().__init__()
+        window.full_screen = True
+        Entity(model='quad', scale=60, texture='white_cube', texture_scale=(60, 60), rotation_x=90, y=-5,
+               color=color.light_gray)
+        Entity(model='sphere', scale=100, texture='textures/1', double_sided=True)
+        EditorCamera()
+        camera.world_position = (0, 0, -15)
+        self.load_game()
+
+    def load_game(self):
+        pass
+
+    def input(self, key):
+        super().input(key)
 
 
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    game = Game()
+    game.run()
