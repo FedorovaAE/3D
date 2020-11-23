@@ -15,7 +15,7 @@ class Game(Ursina):
         self.action_trigger = True
         self.action_mode = True
         self.massage = Text(origin=(0, 19), color=color.white)
-        self.count_side = 3
+        self.count_side = 5
         self.load_game()
 
     def load_game(self):
