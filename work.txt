@@ -73,7 +73,7 @@ if __name__ == '__main__':
 Сделаем вращение родителя на 90 градусов вокруг оси х,
 по нажатию левой клавиши мыши
     def load_game(self):
-        self.parent = Entity(madel='textures/custom_cube')
+        self.parent = Entity()
         self.cube = Entity(parent=self.parent, model=self.model, texture=self.texture, position=(-1, 1, 1))
         self.rot = 0
 
@@ -87,15 +87,121 @@ if __name__ == '__main__':
 
 Часть 4.
 Представим кубик рубик, который вращается.
-Есть 3 грани.
 Если вращается какая-то грань, то две другие должны
 оставться неподнижны.
 Это можно сделать за счет
-соотнесения координат кубика относительно мировой сцены.
-то есть просисходит смена родителя( то куб, то мировая сцена)
+соотнесения координат кубика относительно сцены.
+то есть просисходит смена родителя( то куб, то сцена)
 итак продолжаем
-1)(создаем левую и нижнюю стороны кубика)
-создаем метод для определения выбранных сторон
+1)Cоздаем стороны кубика
+Создаем метод, в котором определеним позиции выбранных сторон
+Позиции кубика в каждой стороне
+self.LEFT = {Vec3(-1, y, z) for y in range(-1, 2) for z in range(-1, 2)}
+делаем это при помощи циклов
+и помимо этого они будут хранится в множествах
+у нас получается такая функция
+    def create_cube_positions(self):
+        self.LEFT = {Vec3(-1, y, z) for y in range(-1, 2) for z in range(-1, 2)}
+        self.BOTTOM = {Vec3(x, -1, z) for x in range(-1, 2) for z in range(-1, 2)}
+        self.FACE = {Vec3(x, y, -1) for x in range(-1, 2) for y in range(-1, 2)}
+        self.BACK = {Vec3(x, y, 1) for x in range(-1, 2) for y in range(-1, 2)}
+        self.RIGHT = {Vec3(1, y, z) for y in range(-1, 2) for z in range(-1, 2)}
+        self.TOP = {Vec3(x, 1, z) for x in range(-1, 2) for z in range(-1, 2)}
+        self.SIDE_POSITIONS = self.LEFT | self.BOTTOM | self.FACE | self.BACK | self.RIGHT | self.TOP
 
+2)В функции load_game вызываем этот метод - вычислятся позиции кубиков для каждой из сторон
+проходимся по этим координатам и создаем нужные нам объекты
+создаем первый словарь: ключи - названия сторон куба, значения - оси вращения для каждой стороны
+создаем второй словарь для определения всех позиций кубиков по каждой стороне:
+создаем переменную для обозначения времени анимации (как быстро будут поварачиваться сегменты)
+получившаяся функция
+    def load_game(self):
+        self.create_cube_positions()
+        self.CUBES = [Entity(model=self.model, texture=self.texture, position=pos) for pos in self.SIDE_POSITIONS]
+        self.PARENT = Entity()
+        self.rotation_axes = {'LEFT': 'x', 'RIGHT': 'x', 'TOP': 'y', 'BOTTOM': 'y', 'FACE': 'z', 'BACK': 'z'}
+        self.cubes_side_positons = {'LEFT': self.LEFT, 'BOTTOM': self.BOTTOM, 'RIGHT': self.RIGHT, 'FACE': self.FACE,
+                                    'BACK': self.BACK, 'TOP': self.TOP}
+        self.animation_time = 0.5
 
+3)создаем отдельный метод для смены родителя (от центрального кубика к сцене)
+будем проходиться по всем потомкам
+и у кого родитель центральный кубик -
+    записываем мировые координаты
+    меняем родителя на сцену
+    присвоим позиции потомка его координаты сцены
+    и приравняем к 0 значение вращение центрального кубика
+        def reparent_to_scene(self):
+        for cube in self.CUBES:
+            if cube.parent == self.PARENT:
+                world_pos, world_rot = round(cube.world_position, 1), cube.world_rotation
+                cube.parent = scene
+                cube.position, cube.rotation = world_pos, world_rot
+        self.PARENT.rotation = 0
 
+4) напишем метод для поворота необходимой стороны кубика рубика
+по передаваемому имени стороны определим координаты всех кубиков данной стороны
+и получим значение оси вокруг которой надо сделать поворот
+здесь же и будем вызывать метод по смене родителя.
+и проходясь по всем кубикам нам нужны будут кубики для текущей стороны,
+ где назначим родителем центральный кубик и при помощи удобной функции eval вызовем код внутри
+ себя по запуску анимации поворота  вокруг нужной оси
+     def rotate_side(self, side_name):
+        cube_positions = self.cubes_side_positons[side_name]
+        rotation_axis = self.rotation_axes[side_name]
+        self.reparent_to_scene()
+        for cube in self.CUBES:
+            if cube.position in cube_positions:
+                cube.parent = self.PARENT
+                eval(f'self.PARENT.animate_rotation_{rotation_axis}(90, duration=self.animation_time)')
+
+5)и добавим управление при котором при нажании определенной клавиши будет поворачиваться определенная сторона
+    def input(self, key):
+        keys = dict(zip('asdzxc', 'LEFT BOTTOM RIGHT TOP FACE BACK'.split()))
+        if key in keys:
+            self.rotate_side(keys[key])
+        super().input(key)
+
+на данном этапе у нас уже получился кубик рубик, но есть один недостаток
+когда мы нажимаен на клавишу происходит анимация сегмента
+и когда мы быстро нажимаем несколько клавишь то сегменты врезаются друг в друга
+*фото3*
+
+6)создаем триггер для разрешения поворота стороны
+с его помощью будем менять значение триггера
+    def toggle_animation_trigger(self):
+        self.action_trigger = not self.action_trigger
+
+и как только начинает вращаться какая-то сторона присваем ему ложное значение
+и это значение станет истинным как только мы заканчиваем анимацию
+    def rotate_side(self, side_name):
+        self.action_trigger = False
+        cube_positions = self.cubes_side_positions[side_name]
+        rotation_axis = self.rotation_axes[side_name]
+        self.reparent_to_scene()
+        for cube in self.CUBES:
+            if cube.position in cube_positions:
+                cube.parent = self.PARENT
+                eval(f'self.PARENT.animate_rotation_{rotation_axis}(90, duration=self.animation_time)')
+        invoke(self.toggle_animation_trigger, delay=self.animation_time + 0.11)
+
+а состояние триггера будем проверять при нажатии очередной клавиши
+    def input(self, key):
+        keys = dict(zip('asdzxc', 'LEFT BOTTOM RIGHT TOP FACE BACK'.split()))
+        if key in keys and self.action_trigger:
+            self.rotate_side(keys[key])
+        super().input(key)
+
+на данном этапе кубик уже хорошо работает
+*видео3*
+
+Часть 5.
+помимо кубика 3 на 3, создаем кубик 5 на 5
+но так как у нас появляется в 2 раза больше стророн, то утравлять кнопками неудобно
+так как для управления кубика нужно уже 12 кнопок
+на основе кубика 3 на 3 сделаем более приятное управление
+
+1) делаем 2 режима: обзора и взаимодействия
+сделаем это через логическую переменную
+self.action_mode = True
+и будем ввыводить текст на экран о том в каком режиме мы работаем
