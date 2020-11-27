@@ -3,9 +3,12 @@ from ursina import camera, mouse
 
 
 class Game(Ursina):
-    def __init__(self):
+    def __init__(self, count_sid):
         super().__init__()
         window.full_screen = True
+        # b = Button(text='hello world!', color=color.azure, origin=(-7.5, 0), icon='sword', scale=.25)
+        # b.on_click = application.quit  # assign a function to the button.
+        # b.tooltip = Tooltip('exit')
         Entity(model='quad', scale=60, texture='white_cube', texture_scale=(60, 60), rotation_x=90, y=-5,
                color=color.violet)
         Entity(model='sphere', scale=100, texture='textures/1', double_sided=True)
@@ -15,7 +18,7 @@ class Game(Ursina):
         self.action_trigger = True
         self.action_mode = True
         self.massage = Text(origin=(0, 19), color=color.white)
-        self.count_side = 5
+        self.count_side = count_sid
         self.load_game()
 
     def load_game(self):
@@ -140,9 +143,6 @@ class Game(Ursina):
                     break
         if key == 'mouse2':
             self.toggle_game_mode()
+        if key == 'escape':
+            sys.exit()
         super().input(key)
-
-
-if __name__ == '__main__':
-    game = Game()
-    game.run()
